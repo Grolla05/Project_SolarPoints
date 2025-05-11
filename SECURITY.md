@@ -10,4 +10,4 @@ This section provides information for users regarding the validated and stable v
 
 ## Reporting a Vulnerability
 
-There is a critical vulnerability affecting the overall operation of the project, specifically related to the full-wave rectifier power supply (AC to DC conversion). This component is a key element of the system and must be closely monitored during implementation due to its sensitivity and impact on circuit stability.
+The circuit developed by our team throughout the project’s prototyping phase was designed to be a self-sustaining and intelligent system, requiring no human intervention. However, our greatest challenge was completing the task without using any microcontrollers (such as Arduino), which ultimately made the project more viable in terms of cost and performance. That said, several concerns were raised regarding potential vulnerabilities—particularly with the battery—since circuits of this nature often suffer from chronic issues like battery degradation or loss of capacity over time.
