@@ -1,4 +1,4 @@
-## First version of the project (CLOCK LED with only analog and logic circuit)
+## First version of the project (Solar Point with only analog circuit)
 
 <img src="">
 
