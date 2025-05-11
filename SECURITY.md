@@ -2,20 +2,12 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+This section provides information for users regarding the validated and stable version of the project that has been tested and is deemed safe for deployment, as well as identifying versions that remain untested or are considered unstable for application.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| 1.0     | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
-
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+There is a critical vulnerability affecting the overall operation of the project, specifically related to the full-wave rectifier power supply (AC to DC conversion). This component is a key element of the system and must be closely monitored during implementation due to its sensitivity and impact on circuit stability.
