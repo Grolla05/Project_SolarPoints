@@ -6,9 +6,9 @@
 
 ---
 
-## 🌙 What is IluminaClássico?
+## 🌙 What is Solar Points?
 
-**IluminaClássico** is an **autonomous and intelligent public lighting system** designed for areas lacking electrical infrastructure, such as:
+**Solar Points** is an **autonomous and intelligent public lighting system** designed for areas lacking electrical infrastructure, such as:
 
 - Bus stops  
 - Alleys and narrow streets  
