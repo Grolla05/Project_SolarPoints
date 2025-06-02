@@ -59,7 +59,7 @@ Beyond its practical application, this project demonstrates the **feasibility of
 <img src="https://github.com/Grolla05/Project_SolarPoints/blob/513a21dbef6b11c8d37a4105c89ce2432da838d8/Versions/SolarPoints1.0/First_version.png">
 
 ### BRD Circuit file
-<img src="https://github.com/Grolla05/Project_SolarPoints/blob/c9674fc39024c1f25d5fec4124e2d89baf0e78ac/Versions/SolarPoints1.0/BRD_circuit_image.png">
+<img src="https://github.com/Grolla05/Project_SolarPoints/blob/db144476760ef783a8569c1ee93c8ba1ad0f6e2c/Versions/SolarPoints1.0/BRD_circuit_image.png">
 
 ---
 
@@ -71,6 +71,7 @@ Developed by:
 - **Guilherme Oliveira Nogueira** - Control and Automation Engineering Student (PUC-Campinas)
 - **Giovanna Lima Salvagnini** - Control and Automation Engineering Student (PUC-Campinas)
 - **Henrique Spadaccia Chambó** - Control and Automation Engineering Student (PUC-Campinas)
+- **Luca** - Control and Automation Engineering Student (PUC-Campinas)
 
 ---
 
