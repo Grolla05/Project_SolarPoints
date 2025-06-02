@@ -15,7 +15,7 @@
 - Public squares  
 - Peripheral and isolated regions  
 
-This project aims to provide **greater safety and well-being** to communities through a **low-cost, sustainable, and technically efficient solution**.
+This project aims to provide **greater safety and well-being** to communities through a **low-cost, sustainable, technically efficient solution and bioengineer**.
 
 ---
 
@@ -47,7 +47,7 @@ Beyond its practical application, this project demonstrates the **feasibility of
 
 - **Discrete components** (resistors, capacitors, transistors, diodes, etc.)  
 - **Analog integrated circuits** (e.g., comparators, voltage regulators)  
-- **Light sensors** (such as LDRs)  
+- **Light sensors** (such as LDR sensor)  
 - **Autonomous DC power sources** (e.g., solar panels + battery)  
 - **Breadboard and/or printed circuit board (PCB)**
 
@@ -71,7 +71,7 @@ Developed by:
 - **Guilherme Oliveira Nogueira** - Control and Automation Engineering Student (PUC-Campinas)
 - **Giovanna Lima Salvagnini** - Control and Automation Engineering Student (PUC-Campinas)
 - **Henrique Spadaccia Chambó** - Control and Automation Engineering Student (PUC-Campinas)
-- **Luca** - Control and Automation Engineering Student (PUC-Campinas)
+- **Luca Gião Arrelaro** - Control and Automation Engineering Student (PUC-Campinas)
 
 ---
 
@@ -87,5 +87,4 @@ Let’s bring light where it’s most needed! 🤝
 
 ---
 
-## The initial project report (Original version the report PT-BR)
-https://docs.google.com/document/d/15Q5Ukf8NV3kQQCNdmG4273UDeBLJhgRvPEK_5T5JpjQ/edit?usp=sharing
+## The initial <a href="https://docs.google.com/document/d/15Q5Ukf8NV3kQQCNdmG4273UDeBLJhgRvPEK_5T5JpjQ/edit?usp=sharing">project report</a> (Original version the report PT-BR)
