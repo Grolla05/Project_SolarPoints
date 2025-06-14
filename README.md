@@ -56,10 +56,16 @@ Beyond its practical application, this project demonstrates the **feasibility of
 ## ✨ Real-World Applications
 
 ### Schematc circuit diagram
-<img src="https://github.com/Grolla05/Project_SolarPoints/blob/513a21dbef6b11c8d37a4105c89ce2432da838d8/Versions/SolarPoints1.0/First_version.png">
+<img src="https://github.com/Grolla05/Project_SolarPoints/blob/e3df9765b2381f3277970ebb81dfad1509907ae8/Versions/SolarPoints2.0/Schematics.png">
 
 ### BRD Circuit file
-<img src="https://github.com/Grolla05/Project_SolarPoints/blob/db144476760ef783a8569c1ee93c8ba1ad0f6e2c/Versions/SolarPoints1.0/BRD_circuit_image.png">
+<img src="https://github.com/Grolla05/Project_SolarPoints/blob/e3df9765b2381f3277970ebb81dfad1509907ae8/Versions/SolarPoints2.0/PCB.png">
+
+### TOP Side in PCB (Printed Circuit Board) project
+<img src="https://github.com/Grolla05/Project_SolarPoints/blob/e3df9765b2381f3277970ebb81dfad1509907ae8/Versions/SolarPoints2.0/Solar_Points%20(top%20side).png">
+
+### BOTTOM Side in PCB (Printed Circuit Board) project
+<img src="https://github.com/Grolla05/Project_SolarPoints/blob/e3df9765b2381f3277970ebb81dfad1509907ae8/Versions/SolarPoints2.0/Solar_Points%20(bottom%20side).png">
 
 ---
 
