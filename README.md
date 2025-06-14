@@ -13,7 +13,9 @@
 - Bus stops  
 - Alleys and narrow streets  
 - Public squares  
-- Peripheral and isolated regions  
+- Peripheral and isolated regions
+- outdoor house
+- ...
 
 This project aims to provide **greater safety and well-being** to communities through a **low-cost, sustainable, technically efficient solution and bioengineer**.
 
