@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 # --- Funções do Banco de Dados ---
 def setup_database():
+    """Cria a pasta e a tabela do banco de dados se não existirem."""
     # Cria a pasta 'database' se ela ainda não existir
     os.makedirs('database', exist_ok=True)
     conn = None
@@ -25,34 +26,53 @@ def setup_database():
             )
         ''')
         conn.commit()
-        # Mensagem de que ocorreu tudo certo na criação do banco
         print("Banco de dados e tabela configurados com sucesso!")
         
-    # Mensagem de erro caso por algum motivo não seja possível criar ou configurar o database.db
     except sqlite3.Error as e:
         print(f"Erro ao configurar o banco de dados: {e}")
     finally:
         if conn:
             conn.close()
 
-def salvar_dados(Dado1, latitude, longitude):
+def salvar_ou_atualizar_dados(Dado1, latitude, longitude):
+    """
+    Verifica se um registro com a mesma localização já existe no banco.
+    Se existir, atualiza o 'Dado1' com a soma. Caso contrário, insere um novo registro.
+    """
     conn = None
     try:
         conn = sqlite3.connect('database/database.db')
         cursor = conn.cursor()
-        # Insere os dados obtidos na API do ESP32 na tabela do database
-        # A instrução INSERT utiliza '?' para segurança, evitando SQL Injection
-        cursor.execute('''
-            INSERT INTO dados_esp32 (Dado1, latitude, longitude)
-            VALUES (?, ?, ?)
-        ''', (Dado1, latitude, longitude))
+        
+        # 1. Tenta encontrar um registro com a mesma latitude e longitude
+        cursor.execute("SELECT Dado1 FROM dados_esp32 WHERE latitude = ? AND longitude = ?", (latitude, longitude))
+        registro_existente = cursor.fetchone()
+
+        if registro_existente:
+            # 2. Se o registro existir, atualiza o valor de Dado1
+            dado1_atual = registro_existente[0]
+            novo_dado1 = dado1_atual + Dado1
+            
+            cursor.execute('''
+                UPDATE dados_esp32
+                SET Dado1 = ?
+                WHERE latitude = ? AND longitude = ?
+            ''', (novo_dado1, latitude, longitude))
+            
+            print(f"Registro atualizado no banco de dados. Dado1 agora é: {novo_dado1}")
+        else:
+            # 3. Se o registro não existir, insere uma nova linha
+            cursor.execute('''
+                INSERT INTO dados_esp32 (Dado1, latitude, longitude)
+                VALUES (?, ?, ?)
+            ''', (Dado1, latitude, longitude))
+            
+            print("Novo registro inserido no banco de dados.")
 
         conn.commit()
-        print("Dados salvos no banco de dados com sucesso!")
 
-    # Mensagem de erro caso por algum motivo não seja possível salvar os dados no banco
     except sqlite3.Error as e:
-        print(f"Erro ao salvar os dados no banco de dados: {e}")
+        print(f"Erro ao salvar/atualizar os dados no banco de dados: {e}")
     finally:
         if conn:
             conn.close()
@@ -74,13 +94,11 @@ def receber_dados():
     try:
         Dado1 = dados_recebidos['Dado1']
 
-        # Extrai os dados do objeto chamado 'localizacao'
         localizacao = dados_recebidos['localizacao']
         latitude = localizacao['latitude']
         longitude = localizacao['longitude']
         
     except KeyError as e:
-        # Se alguma chave estiver faltando, retorna um erro específico
         return jsonify({"erro": f"Chave JSON faltando: {e}"}), 400
 
     # 3. Processamento dos dados recebidos
@@ -89,18 +107,14 @@ def receber_dados():
     print(f"Longitude: {longitude}")
     print(f"Dado1: {Dado1}")
 
-    # 4. Salvar dados no database
-    salvar_dados(Dado1, latitude, longitude)
+    # 4. Chamar a nova função para salvar ou atualizar os dados
+    salvar_ou_atualizar_dados(Dado1, latitude, longitude)
 
     # 5. Responde ao ESP32 com sucesso
     return jsonify({
         "mensagem": "Dados recebidos e processados com sucesso!",
         "status": "OK"
     }), 200
-
-    # Exemplo: Você pode agora salvar esses dados em um banco de dados,
-    # um arquivo de log ou realizar outra ação.
-    # Ex: salvar_em_banco_de_dados(latitude, longitude, Dado1)
 
 # Executa o servidor Flask
 if __name__ == '__main__':
