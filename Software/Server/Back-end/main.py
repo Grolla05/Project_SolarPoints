@@ -19,7 +19,7 @@ def setup_database():
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS dados_esp32 (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Dado1 INTEGER NOT NULL,
+                Contador INTEGER NOT NULL,
                 latitude REAL NOT NULL,
                 longitude REAL NOT NULL,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -34,10 +34,10 @@ def setup_database():
         if conn:
             conn.close()
 
-def salvar_ou_atualizar_dados(Dado1, latitude, longitude):
+def salvar_ou_atualizar_dados(Contador, latitude, longitude):
     """
     Verifica se um registro com a mesma localização já existe no banco.
-    Se existir, atualiza o 'Dado1' com a soma. Caso contrário, insere um novo registro.
+    Se existir, atualiza o 'Contador' com a soma. Caso contrário, insere um novo registro.
     """
     conn = None
     try:
@@ -45,27 +45,27 @@ def salvar_ou_atualizar_dados(Dado1, latitude, longitude):
         cursor = conn.cursor()
         
         # 1. Tenta encontrar um registro com a mesma latitude e longitude
-        cursor.execute("SELECT Dado1 FROM dados_esp32 WHERE latitude = ? AND longitude = ?", (latitude, longitude))
+        cursor.execute("SELECT Contador FROM dados_esp32 WHERE latitude = ? AND longitude = ?", (latitude, longitude))
         registro_existente = cursor.fetchone()
 
         if registro_existente:
-            # 2. Se o registro existir, atualiza o valor de Dado1
-            dado1_atual = registro_existente[0]
-            novo_dado1 = dado1_atual + Dado1
+            # 2. Se o registro existir, atualiza o valor de Contador
+            Contador_atual = registro_existente[0]
+            novo_Contador = Contador_atual + Contador
             
             cursor.execute('''
                 UPDATE dados_esp32
-                SET Dado1 = ?
+                SET Contador = ?
                 WHERE latitude = ? AND longitude = ?
-            ''', (novo_dado1, latitude, longitude))
+            ''', (novo_Contador, latitude, longitude))
             
-            print(f"Registro atualizado no banco de dados. Dado1 agora é: {novo_dado1}")
+            print(f"Registro atualizado no banco de dados. Contador agora é: {novo_Contador}")
         else:
             # 3. Se o registro não existir, insere uma nova linha
             cursor.execute('''
-                INSERT INTO dados_esp32 (Dado1, latitude, longitude)
+                INSERT INTO dados_esp32 (Contador, latitude, longitude)
                 VALUES (?, ?, ?)
-            ''', (Dado1, latitude, longitude))
+            ''', (Contador, latitude, longitude))
             
             print("Novo registro inserido no banco de dados.")
 
@@ -92,8 +92,7 @@ def receber_dados():
 
     # 2. Extrai os dados do JSON
     try:
-        Dado1 = dados_recebidos['Dado1']
-
+        Contador = dados_recebidos['Contador']
         localizacao = dados_recebidos['localizacao']
         latitude = localizacao['latitude']
         longitude = localizacao['longitude']
@@ -105,10 +104,10 @@ def receber_dados():
     print("\nDados processados:")
     print(f"Latitude: {latitude}")
     print(f"Longitude: {longitude}")
-    print(f"Dado1: {Dado1}")
+    print(f"Contador: {Contador}")
 
     # 4. Chamar a nova função para salvar ou atualizar os dados
-    salvar_ou_atualizar_dados(Dado1, latitude, longitude)
+    salvar_ou_atualizar_dados(Contador, latitude, longitude)
 
     # 5. Responde ao ESP32 com sucesso
     return jsonify({
