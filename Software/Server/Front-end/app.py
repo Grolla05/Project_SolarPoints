@@ -38,8 +38,8 @@ class Item(db.Model):
     # Define as colunas da tabela. Cada uma representa um campo no banco.
     # 'id': Chave primária, auto-incrementada.
     id = db.Column('Id', db.Integer, primary_key=True)
-    # 'dado1': Um campo para armazenar a contagem de pessoas.
-    dado1 = db.Column('Dado1', db.Integer, nullable=False)
+    # 'contador': Um campo para armazenar a contagem de pessoas.
+    contador = db.Column('Contador', db.Integer, nullable=False)
     # 'latitude': Um campo para a latitude, usando o tipo REAL (ponto flutuante).
     latitude = db.Column('Latitude', db.REAL, nullable=False)
     # 'longitude': Um campo para a longitude.
@@ -50,7 +50,7 @@ class Item(db.Model):
     # que é compreendido pelo navegador.
     def to_dict(self):
         return {
-            'dado1': self.dado1,
+            'contador': self.contador,
             'latitude': self.latitude,
             'longitude': self.longitude,
             'id': self.id,
