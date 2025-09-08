@@ -4,8 +4,8 @@ from flask import Flask, render_template
 
 # --- CONFIGURAÇÃO ---
 # Esta é a URL da sua API de back-end que está rodando na Vercel.
-# VERIFIQUE se 'solar-points-back' é o nome exato do seu projeto de back-end na Vercel.
-DATA_SOURCE_URL = "https://solar-points-back.vercel.app/api/items"
+# VERIFIQUE se 'solarpointsback' é o nome exato do seu projeto de back-end na Vercel.
+DATA_SOURCE_URL = "https://solarpointsback.vercel.app/api/items"
 
 # Configuração para encontrar as pastas 'templates' e 'static'.
 basedir = os.path.abspath(os.path.dirname(__file__))
