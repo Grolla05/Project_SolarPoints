@@ -1,122 +1,109 @@
 import os
-import sqlite3
+import sqlalchemy
 from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 
 app = Flask(__name__)
 
-# --- Funções do Banco de Dados ---
-def setup_database():
-    """Cria a pasta e a tabela do banco de dados se não existirem."""
-    # Cria a pasta 'database' se ela ainda não existir
-    os.makedirs('database', exist_ok=True)
-    conn = None
-    try:
-        # Conecta ao banco de dados (o arquivo será criado se não existir)
-        conn = sqlite3.connect('database/database.db')
-        cursor = conn.cursor()
-        
-        # Cria a tabela 'dados_esp32'
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS dados_esp32 (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Contador INTEGER NOT NULL,
-                latitude REAL NOT NULL,
-                longitude REAL NOT NULL,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        conn.commit()
-        print("Banco de dados e tabela configurados com sucesso!")
-        
-    except sqlite3.Error as e:
-        print(f"Erro ao configurar o banco de dados: {e}")
-    finally:
-        if conn:
-            conn.close()
+# --- CONFIGURAÇÃO DO BANCO DE DADOS NA NUVEM ---
+# A URL de conexão DEVE ser configurada como uma variável de ambiente na Vercel.
+# Exemplo de URL: "postgresql://user:password@host:port/database"
+db_url = os.environ.get("DATABASE_URL")
 
-def salvar_ou_atualizar_dados(Contador, latitude, longitude):
-    """
-    Verifica se um registro com a mesma localização já existe no banco.
-    Se existir, atualiza o 'Contador' com a soma. Caso contrário, insere um novo registro.
-    """
-    conn = None
-    try:
-        conn = sqlite3.connect('database/database.db')
-        cursor = conn.cursor()
-        
-        # 1. Tenta encontrar um registro com a mesma latitude e longitude
-        cursor.execute("SELECT Contador FROM dados_esp32 WHERE latitude = ? AND longitude = ?", (latitude, longitude))
-        registro_existente = cursor.fetchone()
+if not db_url:
+    raise ValueError("A variável de ambiente DATABASE_URL não foi definida.")
 
-        if registro_existente:
-            # 2. Se o registro existir, atualiza o valor de Contador
-            Contador_atual = registro_existente[0]
-            novo_Contador = Contador_atual + Contador
-            
-            cursor.execute('''
-                UPDATE dados_esp32
-                SET Contador = ?
-                WHERE latitude = ? AND longitude = ?
-            ''', (novo_Contador, latitude, longitude))
-            
-            print(f"Registro atualizado no banco de dados. Contador agora é: {novo_Contador}")
-        else:
-            # 3. Se o registro não existir, insere uma nova linha
-            cursor.execute('''
-                INSERT INTO dados_esp32 (Contador, latitude, longitude)
-                VALUES (?, ?, ?)
-            ''', (Contador, latitude, longitude))
-            
-            print("Novo registro inserido no banco de dados.")
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-        conn.commit()
+# Inicializa a extensão SQLAlchemy
+db = SQLAlchemy(app)
 
-    except sqlite3.Error as e:
-        print(f"Erro ao salvar/atualizar os dados no banco de dados: {e}")
-    finally:
-        if conn:
-            conn.close()
 
-# Função da Rota API para obter os dados do ESP32
-# Define a rota para receber os dados. Está sendo utilizado o método POST.
-# O ESP32 deverá enviar a requisição para "http://seu-endereco-ip:3000/Back-end"
-@app.route('/Back-end', methods=['POST'])
-def receber_dados():
-    # 1. Verifica se a requisição é do tipo JSON
+# --- ROTA PARA O ESP32 ENVIAR DADOS ---
+@app.route('/receber-dados-esp', methods=['POST'])
+def receber_dados_esp():
+    """Recebe dados do ESP32 e salva/atualiza no banco de dados na nuvem."""
     if not request.json:
-        return jsonify({"erro": "Requisição deve ser JSON"}), 400
+        return jsonify({"erro": "A requisição deve ser no formato JSON"}), 400
 
-    dados_recebidos = request.json
-    print("Dados brutos recebidos do ESP32:")
-    print(dados_recebidos)
+    dados = request.json
+    print(f"Dados recebidos do ESP32: {dados}")
 
-    # 2. Extrai os dados do JSON
     try:
-        Contador = dados_recebidos['Contador']
-        localizacao = dados_recebidos['localizacao']
-        latitude = localizacao['latitude']
-        longitude = localizacao['longitude']
-        
-    except KeyError as e:
-        return jsonify({"erro": f"Chave JSON faltando: {e}"}), 400
+        contador = int(dados['Contador'])
+        latitude = float(dados['localizacao']['latitude'])
+        longitude = float(dados['localizacao']['longitude'])
+    except (KeyError, TypeError, ValueError) as e:
+        return jsonify({"erro": f"Dados JSON inválidos ou faltando: {e}"}), 400
 
-    # 3. Processamento dos dados recebidos
-    print("\nDados processados:")
-    print(f"Latitude: {latitude}")
-    print(f"Longitude: {longitude}")
-    print(f"Contador: {Contador}")
+    try:
+        # Usando a engine do SQLAlchemy para executar SQL puro com segurança
+        engine = db.get_engine()
+        with engine.connect() as connection:
+            # 1. Verifica se já existe um registro para esta localização
+            result = connection.execute(
+                text("SELECT \"Contador\" FROM dados_esp32 WHERE latitude = :lat AND longitude = :lon"),
+                {"lat": latitude, "lon": longitude}
+            ).fetchone()
 
-    # 4. Chamar a nova função para salvar ou atualizar os dados
-    salvar_ou_atualizar_dados(Contador, latitude, longitude)
+            if result:
+                # 2. Se existe, atualiza o contador somando o valor recebido
+                contador_atual = result[0]
+                novo_contador = contador_atual + contador
+                connection.execute(
+                    text("UPDATE dados_esp32 SET \"Contador\" = :novo_cont WHERE latitude = :lat AND longitude = :lon"),
+                    {"novo_cont": novo_contador, "lat": latitude, "lon": longitude}
+                )
+                print(f"Registro atualizado. Novo contador: {novo_contador}")
+            else:
+                # 3. Se não existe, insere um novo registro
+                connection.execute(
+                    text("INSERT INTO dados_esp32 (\"Contador\", latitude, longitude) VALUES (:cont, :lat, :lon)"),
+                    {"cont": contador, "lat": latitude, "lon": longitude}
+                )
+                print("Novo registro inserido.")
+            
+            # Efetiva a transação
+            connection.commit()
 
-    # 5. Responde ao ESP32 com sucesso
-    return jsonify({
-        "mensagem": "Dados recebidos e processados com sucesso!",
-        "status": "OK"
-    }), 200
+        return jsonify({"mensagem": "Dados processados com sucesso!"}), 200
 
-# Executa o servidor Flask
+    except sqlalchemy.exc.SQLAlchemyError as e:
+        print(f"Erro de banco de dados: {e}")
+        return jsonify({"erro": "Ocorreu um erro ao interagir com o banco de dados."}), 500
+    except Exception as e:
+        print(f"Erro inesperado: {e}")
+        return jsonify({"erro": "Ocorreu um erro inesperado no servidor."}), 500
+
+
+# --- ROTA PARA O FRONT-END OBTER OS DADOS ---
+@app.route('/api/items', methods=['GET'])
+def get_items_for_frontend():
+    """Exporta todos os dados do banco para serem consumidos pelo front-end."""
+    try:
+        engine = db.get_engine()
+        with engine.connect() as connection:
+            # Seleciona todos os registros da tabela
+            result = connection.execute(text("SELECT id, \"Contador\", latitude, longitude FROM dados_esp32")).fetchall()
+            
+            # Converte o resultado em uma lista de dicionários (formato JSON)
+            items_data = [
+                {"id": row[0], "contador": row[1], "latitude": row[2], "longitude": row[3]}
+                for row in result
+            ]
+            
+            return jsonify(items_data)
+            
+    except Exception as e:
+        print(f"Erro ao buscar dados para o front-end: {e}")
+        return jsonify({"erro": "Não foi possível obter os dados."}), 500
+
+
+# O if __name__ == '__main__' é útil para testes locais, mas não é executado na Vercel.
 if __name__ == '__main__':
-    # Para criação do banco antes do envio dos dados
-    setup_database()
+    # Para testes locais, você pode usar um arquivo .env para definir DATABASE_URL
+    # from dotenv import load_dotenv
+    # load_dotenv()
     app.run(host='0.0.0.0', port=3000, debug=True)

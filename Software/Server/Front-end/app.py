@@ -6,9 +6,8 @@ from sqlalchemy import func
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Define o caminho para o arquivo do banco de dados SQLite.
-db_path = os.path.abspath(os.path.join(basedir, "..", "Back-end", "database", "database.db"))
-# Cria a URI de conexão com o banco de dados.
-db_uri = f"sqlite:///{os.path.abspath(db_path)}"
+DATA_SOURCE_URL = os.environ.get("DATA_SOURCE_URL", "https://api.exemplo.com/seus-dados")
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Inicializa a aplicação Flask.
 # `template_folder` e `static_folder` são configurados para
