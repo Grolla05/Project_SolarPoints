@@ -9,9 +9,91 @@
       href="{{ url_for('static', filename='favicon.svg') }}"
       type="image/svg"
     />
+    <!-- 1. Script principal do Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='global.css') }}">
-    <script src="{{ url_for('static', filename='tailwindconfig.js') }}"></script>
+
+    <!-- 2. Configuração e Estilos Customizados -->
+    <script>
+      // Configuração do Tailwind (equivalente ao tailwindconfig.js)
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'night': {
+                '900': '#0C111E',
+              },
+              'solar': {
+                '300': '#FDE047', // Amarelo claro
+                '400': '#FBBF24', // Amarelo principal
+                '500': '#F59E0B', // Amarelo/Laranja
+              },
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+    <style type="text/tailwindcss">
+      /* 3. Estilos customizados (equivalente ao global.css) */
+      @layer utilities {
+        /* Efeito de vidro "Glassmorphism" */
+        .glass-effect {
+          @apply bg-white/10 backdrop-blur-md border border-white/20;
+        }
+        /* Gradiente para textos */
+        .text-gradient {
+          @apply bg-gradient-to-r from-solar-300 via-solar-400 to-solar-500 bg-clip-text text-transparent;
+        }
+        /* Efeito de elevação no hover */
+        .hover-lift {
+          @apply transition-transform duration-300 ease-in-out hover:-translate-y-1;
+        }
+      }
+      /* 4. Animações customizadas */
+      @keyframes slide-in {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes glow {
+        0%, 100% {
+          box-shadow: 0 0 5px theme('colors.solar.400'), 0 0 10px theme('colors.solar.400');
+        }
+        50% {
+          box-shadow: 0 0 20px theme('colors.solar.300'), 0 0 30px theme('colors.solar.300');
+        }
+      }
+       @keyframes spin-slow {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      /* 5. Classes que usam as animações */
+      .animate-slide-in {
+        animation: slide-in 0.7s ease-out forwards;
+      }
+      .animate-glow {
+        animation: glow 2.5s infinite ease-in-out;
+      }
+      .sun-icon {
+        animation: spin-slow 15s linear infinite;
+      }
+      /* 6. Estilo de fundo para o body */
+      body {
+        @apply bg-night-900;
+      }
+    </style>
+
   </head>
   <body class="font-sans antialiased text-white">
     <!-- Header com efeito glassmorphism -->
@@ -33,7 +115,7 @@
           
           <nav class="flex items-center space-x-3">
             <a href="{{ url_for('index') }}">
-              <button class="px-6 py-2.5 bg-gradient-solar text-night-900 font-semibold rounded-full hover-lift hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <button class="px-6 py-2.5 bg-gradient-to-r from-solar-400 to-solar-500 text-night-900 font-semibold rounded-full hover-lift hover:shadow-lg transition-all duration-300 hover:scale-105">
                 <svg class="inline w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
                 </svg>
@@ -52,7 +134,7 @@
           <!-- Card principal com efeito glassmorphism -->
           <div class="glass-effect rounded-3xl overflow-hidden shadow-2xl animate-slide-in">
             <!-- Barra de status superior -->
-            <div class="bg-gradient-solar p-1">
+            <div class="bg-gradient-to-r from-solar-400 to-solar-500 p-1">
               <div class="flex items-center justify-center space-x-6 text-night-900 text-sm font-medium">
                 <div class="flex items-center space-x-2">
                   <div class="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
@@ -67,50 +149,7 @@
             
             <main class="p-8">
               <section class="space-y-8">
-                {% block body %}
-                <div class="text-center mb-12">
-                  <h2 class="text-4xl font-bold text-white mb-4">
-                    Bem-vindo ao <span class="text-gradient">Solar Points</span>
-                  </h2>
-                  <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-                    Sistema inteligente de iluminação pública autônoma para áreas com baixa infraestrutura. 
-                    Segurança, sustentabilidade e eficiência energética em uma solução inovadora.
-                  </p>
-                </div>
-
-                <!-- Cards de funcionalidades -->
-                <div class="grid md:grid-cols-3 gap-6">
-                  <div class="glass-effect p-6 rounded-2xl hover-lift">
-                    <div class="w-12 h-12 bg-solar-400 rounded-xl flex items-center justify-center mb-4 animate-glow">
-                      <svg class="w-6 h-6 text-night-900" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                      </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-2">Ativação Inteligente</h3>
-                    <p class="text-gray-400">Sensores de luminosidade e presença para acionamento automático e eficiente.</p>
-                  </div>
-
-                  <div class="glass-effect p-6 rounded-2xl hover-lift">
-                    <div class="w-12 h-12 bg-green-400 rounded-xl flex items-center justify-center mb-4">
-                      <svg class="w-6 h-6 text-night-900" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm4 14a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-                      </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-2">Energia Sustentável</h3>
-                    <p class="text-gray-400">100% alimentado por energia solar com baterias de longa duração.</p>
-                  </div>
-
-                  <div class="glass-effect p-6 rounded-2xl hover-lift">
-                    <div class="w-12 h-12 bg-blue-400 rounded-xl flex items-center justify-center mb-4">
-                      <svg class="w-6 h-6 text-night-900" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
-                      </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-2">Baixo Consumo</h3>
-                    <p class="text-gray-400">Microcontrolador e conversores DC-DC para máxima eficiência energética.</p>
-                  </div>
-                </div>
-                {% endblock %}
+                {% block body %}{% endblock %}
               </section>
             </main>
           </div>
@@ -142,3 +181,4 @@
     </footer>
   </body>
 </html>
+
