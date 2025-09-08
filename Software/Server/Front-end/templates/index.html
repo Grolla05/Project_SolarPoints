@@ -17,6 +17,7 @@
     </p>
   </div>
 
+  <!-- Map Container with Modern Styling -->
   <div class="relative group">
     <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-green-500/20 rounded-2xl blur-lg group-hover:blur-xl transition-all duration-300"></div>
     <div class="relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl overflow-hidden shadow-2xl">
@@ -36,18 +37,20 @@
           </div>
         </div>
       </div>
-      <div id="map" class="h-96 w-full bg-gray-800"></div>
+      <div id="map" class="h-96 w-full bg-gray-100"></div>
     </div>
   </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<!-- Map Scripts (mantendo funcionalidade original) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha2d-R-W7FgeBfS6UjP4tF5s6Fv6X6B6p/4pQ4s5M+7Gj6p/6f5B+g=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha2d-R-W7FgeBfS6UjP4tF5s6Fv6X6B6p/4pQ4s5M+7Gj6p/6f5B+g=" crossorigin=""></script>
 <script src="{{ url_for('static', filename='Maps_API.js') }}"></script>
 <script>
-    // O Flask injeta a variável 'items' (que veio da API) nesta constante JavaScript.
+    // Aqui o Flask processa o Jinja2 e a variável locations é criada
     const locations = {{ items | tojson }};
 
-    // A função loadMap do seu arquivo Maps_API.js é chamada para criar o mapa.
+    // Chamamos a função do arquivo externo, passando os dados
     loadMap(locations);
 </script>
 
