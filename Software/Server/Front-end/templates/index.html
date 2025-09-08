@@ -50,6 +50,8 @@
     // Aqui o Flask processa o Jinja2 e a variável locations é criada
     const locations = {{ items | tojson }};
 
+    console.log("Dados que chegaram ao front-end para o mapa:", locations);
+    
     // Chamamos a função do arquivo externo, passando os dados
     loadMap(locations);
 </script>
