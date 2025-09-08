@@ -25,7 +25,7 @@ function loadMap(locations) {
         marker.bindPopup(`
             <div style="padding: 8px">
                 <h3 style="margin-top: 0">Dispositivo ID: ${item.id}</h3>
-                <p><strong>Fluxo de Pessoas:</strong> ${item.dado1}/dia</p>
+                <p><strong>Fluxo de Pessoas:</strong> ${item.contador}/dia</p>
                 <p><strong>Latitude:</strong> ${item.latitude}</p>
                 <p><strong>Longitude:</strong> ${item.longitude}</p>
             </div>
