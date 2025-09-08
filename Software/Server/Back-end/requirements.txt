@@ -4,6 +4,7 @@ gunicorn
 SQLAlchemy
 Flask-SQLAlchemy
 psycopg2-binary
+Flask-Cors
 
 # How to install:
 # pip install -r requirements.txt
