@@ -19,13 +19,14 @@ function loadMap(locations) {
 
     // Loop através das localizações e adiciona um marcador para cada uma
     locations.forEach(item => {
+        if (!item.latitude || !item.longitude) return; // ignora dados inválidos
+
         const marker = L.marker([item.latitude, item.longitude]).addTo(map);
 
-        // Adiciona um popup (modal) com o conteúdo personalizado
         marker.bindPopup(`
             <div style="padding: 8px">
                 <h3 style="margin-top: 0">Dispositivo ID: ${item.id}</h3>
-                <p><strong>Fluxo de Pessoas:</strong> ${item.contador}/dia</p>
+                <p><strong>Fluxo de Pessoas:</strong> ${item.contador || 'N/A'}/dia</p>
                 <p><strong>Latitude:</strong> ${item.latitude}</p>
                 <p><strong>Longitude:</strong> ${item.longitude}</p>
             </div>

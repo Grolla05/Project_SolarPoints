@@ -247,11 +247,11 @@
         </div>
         <div>
           <h2 class="text-2xl font-bold text-white mb-1">4. A Camada de Persistência</h2>
-          <p class="text-pink-400 font-medium">(O Banco de Dados SQLite)</p>
+          <p class="text-pink-400 font-medium">(O Banco de Dados em nuvem (PostgreSQL))</p>
         </div>
       </div>
       <p class="text-white/80 mb-6">
-        O <strong class="text-pink-400">SQLite</strong> é a camada final, responsável por guardar 
+        O <strong class="text-pink-400">PostgreSQL</strong> é a camada final, responsável por guardar
         o histórico de todos os dados recebidos.
       </p>
       <div class="space-y-4">
@@ -262,10 +262,9 @@
             </svg>
           </div>
           <div>
-            <strong class="text-white">Arquivo database.db:</strong>
-            <span class="text-white/70"> O sistema cria um arquivo local </span>
-            <code class="bg-gray-800/50 text-yellow-400 px-2 py-1 rounded text-sm">database/database.db</code>
-            <span class="text-white/70"> que funciona como um banco de dados.</span>
+            <strong class="text-white">Arquivo neon.db:</strong>
+            <span class="text-white/70"> O arquivo neon.db foi armazenado em nuvem através da Neon (PostgreSQL).</span>
+            <span class="text-white/70"> No qual se baseia em um serviço gratuito de banco de dados em nuvem.</span>
           </div>
         </div>
         <div class="flex items-start space-x-3">
