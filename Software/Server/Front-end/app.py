@@ -30,7 +30,7 @@ def index():
     try:
         # 1. Faz uma requisição GET para a URL da sua API de back-end.
         #    O timeout é uma boa prática para evitar que a página fique esperando para sempre.
-        response = requests.get(DATA_SOURCE_URL, timeout=10)
+        response = requests.get(DATA_SOURCE_URL, timeout=20)
         
         # 2. Levanta um erro se a resposta da API não for bem-sucedida (ex: 404, 500).
         response.raise_for_status()
