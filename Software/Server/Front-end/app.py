@@ -1,101 +1,66 @@
 import os
-from flask import Flask, render_template, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
+import requests
+from flask import Flask, render_template
 
+# --- CONFIGURAÇÃO ---
+# Esta é a URL da sua API de back-end que está rodando na Vercel.
+# VERIFIQUE se 'solar-points-back' é o nome exato do seu projeto de back-end na Vercel.
+DATA_SOURCE_URL = "https://solar-points-back.vercel.app/api/items"
+
+# Configuração para encontrar as pastas 'templates' e 'static'.
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# Define o caminho para o arquivo do banco de dados SQLite.
-DATA_SOURCE_URL = os.environ.get("DATA_SOURCE_URL", "https://api.exemplo.com/seus-dados")
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-# Inicializa a aplicação Flask.
-# `template_folder` e `static_folder` são configurados para
-# apontar para os diretórios corretos, permitindo que a aplicação
-# encontre os arquivos HTML, CSS e JavaScript.
 app = Flask(__name__,
     template_folder=os.path.join(basedir, 'templates'),
     static_folder=os.path.join(basedir, 'static')
 )
 
-# Configura a aplicação para usar o banco de dados SQLite definido acima.
-app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-# Desabilita uma funcionalidade de rastreamento de modificações para otimizar o uso de recursos.
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# --- ROTA PRINCIPAL ---
 
-# Inicializa a extensão SQLAlchemy, que gerencia a conexão com o banco de dados.
-db = SQLAlchemy(app)
-
-
-# --- Definição do Modelo do Banco de Dados ---
-# Define a classe do modelo 'Item', que representa a tabela 'dados_esp32' no banco de dados.
-# Cada objeto desta classe corresponderá a uma linha na tabela.
-class Item(db.Model):
-    # Define o nome da tabela no banco de dados.
-    __tablename__ = 'dados_esp32'
-    
-    # Define as colunas da tabela. Cada uma representa um campo no banco.
-    # 'id': Chave primária, auto-incrementada.
-    id = db.Column('Id', db.Integer, primary_key=True)
-    # 'contador': Um campo para armazenar a contagem de pessoas.
-    contador = db.Column('Contador', db.Integer, nullable=False)
-    # 'latitude': Um campo para a latitude, usando o tipo REAL (ponto flutuante).
-    latitude = db.Column('Latitude', db.REAL, nullable=False)
-    # 'longitude': Um campo para a longitude.
-    longitude = db.Column('Longitude', db.REAL, nullable=False)
-
-    # Converte um objeto da classe 'Item' em um dicionário Python.
-    # Isso é essencial para converter os dados do banco para o formato JSON,
-    # que é compreendido pelo navegador.
-    def to_dict(self):
-        return {
-            'contador': self.contador,
-            'latitude': self.latitude,
-            'longitude': self.longitude,
-            'id': self.id,
-        }
-
-# --- Rotas da Aplicação (Endpoints da API) ---
-
-# Rota de API para obter todos os itens do banco de dados em formato JSON.
-# Esta rota é chamada por scripts JavaScript no frontend, por exemplo.
-@app.route("/api/items", methods=['GET'])
-def get_items():
-    try:
-        # Consulta todos os registros na tabela 'dados_esp32'.
-        items = Item.query.all()
-        # Converte a lista de objetos 'Item' em uma lista de dicionários.
-        items_data = [item.to_dict() for item in items]
-        # Retorna os dados como uma resposta JSON.
-        return jsonify(items_data)
-    except Exception as e:
-        # Em caso de erro, retorna uma mensagem de erro com status 500.
-        return jsonify({"error": str(e)}), 500
-
-# Rota principal (página inicial) da aplicação web.
 @app.route("/")
 def index():
-    # Consulta todos os registros na tabela 'dados_esp32'.
-    items = Item.query.all()
-    # Converte a lista de objetos 'Item' em uma lista de dicionários,
-    # que será usada para popular o mapa.
-    items_data = [item.to_dict() for item in items]
+    """
+    Renderiza a página inicial. Busca os dados da API do back-end
+    para popular o mapa.
+    """
+    items_data = []
+    online_points_count = 0
+    error_message = None
 
-    # Realiza uma consulta ao banco de dados para contar a quantidade
-    # de IDs distintos, ou seja, o número de pontos online.
-    online_points_count = db.session.query(func.count(Item.id)).scalar()
+    try:
+        # 1. Faz uma requisição GET para a URL da sua API de back-end.
+        #    O timeout é uma boa prática para evitar que a página fique esperando para sempre.
+        response = requests.get(DATA_SOURCE_URL, timeout=10)
+        
+        # 2. Levanta um erro se a resposta da API não for bem-sucedida (ex: 404, 500).
+        response.raise_for_status()
+        
+        # 3. Extrai os dados em formato JSON da resposta.
+        items_data = response.json()
+        
+        # 4. A contagem de pontos é simplesmente o número de itens na lista recebida.
+        online_points_count = len(items_data)
 
-    # Renderiza o template 'index.html', passando a lista de itens e a contagem.
-    # As variáveis 'items' e 'online_points_count' se tornam disponíveis
-    # no template para exibição.
-    return render_template("index.html", items=items_data, online_points_count=online_points_count)
+    except requests.exceptions.RequestException as e:
+        # Captura erros de conexão, timeout, DNS, ou status de erro HTTP.
+        print(f"Erro ao buscar dados da API: {e}")
+        error_message = "Não foi possível carregar os pontos no mapa. O serviço pode estar temporariamente indisponível."
+    except Exception as e:
+        # Captura outros erros (ex: JSON inválido na resposta da API).
+        print(f"Erro ao processar dados da API: {e}")
+        error_message = "Ocorreu um erro ao processar os dados recebidos."
+
+    # 5. Renderiza o template 'index.html', passando os dados (ou uma lista vazia)
+    #    e a contagem para serem usados na página.
+    return render_template(
+        "index.html", 
+        items=items_data, 
+        online_points_count=online_points_count, 
+        error=error_message
+    )
     
-# --- Ponto de Entrada da Aplicação ---
+# --- PONTO DE ENTRADA DA APLICAÇÃO ---
 
-# Garante que o servidor Flask só seja executado quando o script for
-# iniciado diretamente (e não importado por outro script).
 if __name__ == "__main__":
-    # Inicia o servidor em modo de depuração. O servidor reinicia
-    # automaticamente ao detectar mudanças no código, o que é útil
-    # para o desenvolvimento.
-    app.run(debug=os.environ.get("FLASK_DEBUG", "0") == "1")
+    # Inicia o servidor para desenvolvimento local.
+    app.run(debug=True)
