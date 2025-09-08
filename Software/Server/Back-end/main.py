@@ -3,12 +3,12 @@ import sqlalchemy
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
-from flask_cors import CORS # 1. Importa a biblioteca CORS
+from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app) # 2. Habilita o CORS para toda a aplicação
+CORS(app)
 
-# --- CONFIGURAÇÃO DO BANCO DE DADOS NA NUVEM ---
+# --- CONFIGURAÇÃO CORRETA DO BANCO DE DADOS ---
 db_url = os.environ.get("DATABASE_URL")
 
 if not db_url:
@@ -27,7 +27,7 @@ def receber_dados_esp():
         return jsonify({"erro": "A requisição deve ser no formato JSON"}), 400
 
     dados = request.json
-    print(f"Dados recebidos do ESP32: {dados}")
+    print(f"DADOS BRUTOS RECEBIDOS: {dados}")
 
     try:
         contador = int(dados['Contador'])
@@ -51,23 +51,23 @@ def receber_dados_esp():
                     text("UPDATE dados_esp32 SET \"Contador\" = :novo_cont WHERE latitude = :lat AND longitude = :lon"),
                     {"novo_cont": novo_contador, "lat": latitude, "lon": longitude}
                 )
-                print(f"Registro atualizado. Novo contador: {novo_contador}")
+                print(f"LOG: Registro atualizado. Novo contador: {novo_contador}")
             else:
                 connection.execute(
                     text("INSERT INTO dados_esp32 (\"Contador\", latitude, longitude) VALUES (:cont, :lat, :lon)"),
                     {"cont": contador, "lat": latitude, "lon": longitude}
                 )
-                print("Novo registro inserido.")
+                print("LOG: Novo registro inserido.")
             
             connection.commit()
 
         return jsonify({"mensagem": "Dados processados com sucesso!"}), 200
 
     except sqlalchemy.exc.SQLAlchemyError as e:
-        print(f"Erro de banco de dados: {e}")
+        print(f"ERRO DE BANCO DE DADOS: {e}")
         return jsonify({"erro": "Ocorreu um erro ao interagir com o banco de dados."}), 500
     except Exception as e:
-        print(f"Erro inesperado: {e}")
+        print(f"ERRO INESPERADO: {e}")
         return jsonify({"erro": "Ocorreu um erro inesperado no servidor."}), 500
 
 
@@ -75,23 +75,35 @@ def receber_dados_esp():
 @app.route('/api/items', methods=['GET'])
 def get_items_for_frontend():
     """Exporta todos os dados do banco para serem consumidos pelo front-end."""
+    print("\n--- INICIANDO REQUISIÇÃO EM /api/items ---")
+    items_data = []  # Inicializa a variável para garantir que ela exista no 'finally'
+    
     try:
         engine = db.get_engine()
         with engine.connect() as connection:
             result = connection.execute(text("SELECT id, \"Contador\", latitude, longitude FROM dados_esp32")).fetchall()
             
+            print(f"LOG: Dados brutos lidos do banco: {result}")
+
             items_data = [
                 {"id": row[0], "contador": row[1], "latitude": row[2], "longitude": row[3]}
                 for row in result
             ]
             
-            return jsonify(items_data)
+            print(f"LOG: Dados formatados com sucesso antes do envio.")
             
     except Exception as e:
-        print(f"Erro ao buscar dados para o front-end: {e}")
-        return jsonify({"erro": "Não foi possível obter os dados."}), 500
+        print(f"ERRO AO BUSCAR DADOS PARA FRONT-END: {e}")
+        # Retorna uma lista vazia em caso de erro para não quebrar o front-end
+        items_data = [] 
+    
+    finally:
+        # LOG ADICIONADO: Este log será executado SEMPRE, mostrando o que está sendo enviado.
+        print(f"LOG FINAL (Conteúdo do GET): {items_data}")
+        print("--- FIM DA REQUISIÇÃO ---")
+        # A resposta é movida para o bloco 'finally' para garantir que sempre aconteça.
+        return jsonify(items_data)
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000, debug=True)
-
