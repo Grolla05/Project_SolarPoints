@@ -34,7 +34,6 @@ def index():
         
         # 2. Levanta um erro se a resposta da API não for bem-sucedida (ex: 404, 500).
         response.raise_for_status()
-        
         # 3. Extrai os dados em formato JSON da resposta.
         items_data = response.json()
         
