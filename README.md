@@ -76,7 +76,7 @@ O microcontrolador realiza a lógica central: lê sensores (GPIOs/ADC/I2C), deci
 
 ## ✨ Aplicações no mundo real
 
-O Solar Points continua ideal para iluminar pontos sem infraestrutura elétrica: paradas de ônibus, caminhos em áreas rurais, entradas de condomínios e outras localidades onde uma solução autônoma e resiliente faz diferença.
+O Solar Points continua ideal para iluminar pontos sem infraestrutura elétrica: pontos de ônibus, caminhos em áreas rurais, entradas de condomínios e outras localidades onde uma solução autônoma e resiliente faz diferença.
 
 ---
 
