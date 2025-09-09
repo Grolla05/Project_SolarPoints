@@ -19,7 +19,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# --- ROTA PARA O ESP32 ENVIAR DADOS ---
+# --- ROTA PARA O ESP32 ENVIAR DADOS (VERSÃO CORRIGIDA) ---
 @app.route('/receber-dados-esp', methods=['POST'])
 def receber_dados_esp():
     """Recebe dados do ESP32 e salva/atualiza no banco de dados na nuvem."""
@@ -31,17 +31,22 @@ def receber_dados_esp():
 
     try:
         contador = int(dados['Contador'])
-        latitude = float(dados['localizacao']['latitude'])
-        longitude = float(dados['localizacao']['longitude'])
+        
+        # --- INÍCIO DA MUDANÇA ---
+        # Arredonde os valores para garantir consistência na precisão
+        # 6 casas decimais é uma boa precisão para coordenadas
+        latitude = round(float(dados['localizacao']['latitude']), 6)
+        longitude = round(float(dados['localizacao']['longitude']), 6)
+        # --- FIM DA MUDANÇA ---
+
     except (KeyError, TypeError, ValueError) as e:
         return jsonify({"erro": f"Dados JSON inválidos ou faltando: {e}"}), 400
 
     try:
         engine = db.get_engine()
         with engine.connect() as connection:
-            # --- INÍCIO DA MUDANÇA ---
-            # Use um bloco de transação para garantir a atomicidade
             with connection.begin() as trans:
+                # A consulta agora usará os valores arredondados, encontrando correspondências
                 result = connection.execute(
                     text("SELECT \"Contador\" FROM dados_esp32 WHERE latitude = :lat AND longitude = :lon"),
                     {"lat": latitude, "lon": longitude}
