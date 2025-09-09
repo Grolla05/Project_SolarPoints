@@ -39,27 +39,28 @@ def receber_dados_esp():
     try:
         engine = db.get_engine()
         with engine.connect() as connection:
-            result = connection.execute(
-                text("SELECT \"Contador\" FROM dados_esp32 WHERE latitude = :lat AND longitude = :lon"),
-                {"lat": latitude, "lon": longitude}
-            ).fetchone()
+            # --- INÍCIO DA MUDANÇA ---
+            # Use um bloco de transação para garantir a atomicidade
+            with connection.begin() as trans:
+                result = connection.execute(
+                    text("SELECT \"Contador\" FROM dados_esp32 WHERE latitude = :lat AND longitude = :lon"),
+                    {"lat": latitude, "lon": longitude}
+                ).fetchone()
 
-            if result:
-                contador_atual = result[0]
-                novo_contador = contador_atual + contador
-                connection.execute(
-                    text("UPDATE dados_esp32 SET \"Contador\" = :novo_cont WHERE latitude = :lat AND longitude = :lon"),
-                    {"novo_cont": novo_contador, "lat": latitude, "lon": longitude}
-                )
-                print(f"LOG: Registro atualizado. Novo contador: {novo_contador}")
-            else:
-                connection.execute(
-                    text("INSERT INTO dados_esp32 (\"Contador\", latitude, longitude) VALUES (:cont, :lat, :lon)"),
-                    {"cont": contador, "lat": latitude, "lon": longitude}
-                )
-                print("LOG: Novo registro inserido.")
-            
-            connection.commit()
+                if result:
+                    contador_atual = result[0]
+                    novo_contador = contador_atual + contador
+                    connection.execute(
+                        text("UPDATE dados_esp32 SET \"Contador\" = :novo_cont WHERE latitude = :lat AND longitude = :lon"),
+                        {"novo_cont": novo_contador, "lat": latitude, "lon": longitude}
+                    )
+                    print(f"LOG: Registro atualizado. Novo contador: {novo_contador}")
+                else:
+                    connection.execute(
+                        text("INSERT INTO dados_esp32 (\"Contador\", latitude, longitude) VALUES (:cont, :lat, :lon)"),
+                        {"cont": contador, "lat": latitude, "lon": longitude}
+                    )
+                    print("LOG: Novo registro inserido.")
 
         return jsonify({"mensagem": "Dados processados com sucesso!"}), 200
 
