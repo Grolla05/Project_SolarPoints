@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 # --- CONFIGURAÇÃO ---
 # Esta é a URL da sua API de back-end que está rodando na Vercel.
@@ -26,6 +26,10 @@ def index():
     items_data = []
     online_points_count = 0
     error_message = None
+    # NOVO: Captura os parâmetros de filtro da URL.
+    # O 'type=int' tenta converter o valor para inteiro. Se falhar (ex: texto vazio), retorna None.
+    min_flow = request.args.get('minFlow', default=None, type=int)
+    max_flow = request.args.get('maxFlow', default=None, type=int)
 
     try:
         # 1. Faz uma requisição GET para a URL da sua API de back-end.
@@ -48,12 +52,35 @@ def index():
         # Captura outros erros (ex: JSON inválido na resposta da API).
         print(f"Erro ao processar dados da API: {e}")
         error_message = "Ocorreu um erro ao processar os dados recebidos."
+        
+    # Lógica para filtrar os dados em Python
+    filtered_items = []
+    if items_data: # Apenas filtra se houver dados
+        for item in items_data:
+            # Pega o valor do contador, assumindo 0 se não existir para evitar erros
+            contador = item.get('contador', 0)
+            
+            # Condições para o filtro
+            keep_item = True # Começa assumindo que o item será mantido
+            
+            if min_flow is not None and contador < min_flow:
+                keep_item = False
+            
+            if max_flow is not None and contador > max_flow:
+                keep_item = False
+            
+            if keep_item:
+                filtered_items.append(item)
+    
+    # MODIFICADO: A contagem de pontos agora é baseada nos itens filtrados.
+    online_points_count = len(filtered_items)
+
 
     # 5. Renderiza o template 'index.html', passando os dados (ou uma lista vazia)
     #    e a contagem para serem usados na página.
     return render_template(
         "index.html", 
-        items=items_data, 
+        items=filtered_items, 
         online_points_count=online_points_count, 
         error=error_message
     )
