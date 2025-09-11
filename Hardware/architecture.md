@@ -119,6 +119,7 @@ O sistema opera em um ciclo contínuo, com a energia e a lógica seguindo um flu
 * <a href="https://components101.com/sites/default/files/component_datasheet/LDR%20Datasheet.pdf">Sensor de Luz (LDR)</a>
 * <a href="https://www.eletruscomp.com.br/arquivos/1488539846_dados_tecnicos_p9___gbk_rele_10a_simples.pdf">Relay</a>
 * Lampada LED
+* <a href="https://content.u-blox.com/sites/default/files/products/documents/NEO-6_DataSheet_%28GPS.G6-HW-09005%29.pdf">Módulo GPS (NEO-6)</a>
 * Resistores: 10kΩ, 1kΩ e 220Ω (ou 330Ω)
 
 -----
