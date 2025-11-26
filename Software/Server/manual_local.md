@@ -1,4 +1,4 @@
-# Manual de Execução do Sistema Solar Points
+# Manual de Execução do Sistema Solar Points Localmente
 
 Este manual fornece um guia passo a passo para configurar e executar os servidores de back-end e front-end do sistema Solar Points, além de demonstrar como simular o envio de dados usando o Postman.
 
