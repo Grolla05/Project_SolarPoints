@@ -2,7 +2,7 @@
 
 > Light where there’s no infrastructure. Safety through simplicity and efficiency.
 
-![Status](https://img.shields.io/badge/status-in%20development-yellow)
+![Status](https://img.shields.io/badge/status-complete-green)
 
 ---
 
