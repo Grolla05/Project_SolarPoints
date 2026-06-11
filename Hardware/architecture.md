@@ -20,7 +20,7 @@ O circuito é centrado em um chip de **Gerenciamento de Energia** (Power Managem
 |              ▼                                            ▼                                                                  |
 |       +------+--------------------------------------------+------------------------------------------------------------------+
 |       |      |                                            |                                                                  |
-|       |      | Carrega/Descarrega (BAT)                     |                                                                |
+|       |      | Carrega/Descarrega (BAT)                   |                                                                  |
 |       |      |                                            |                                                                  |
 |       ▼      ▼                                            ▼                                                                  |
 |  +----------+----------+                        +-------------------------+                                                  |

@@ -23,11 +23,14 @@ O servidor de back-end (`main.py`) é responsável por receber os dados enviados
 
 1. Abra um terminal e navegue até a pasta `Back-end`.
 2. Execute o servidor com o seguinte comando:
+
     ```bash
     python main.py
     ```
+
 3. Você verá uma mensagem no terminal indicando que o servidor está rodando. Por padrão, ele será executado na porta **3000**.
-    ```
+
+    ```terminal
     * Running on [http://0.0.0.0:3000/](http://0.0.0.0:3000/)
     ```
 
@@ -37,13 +40,17 @@ O servidor de front-end (`app.py`) é responsável por consultar os dados do ban
 
 1. Abra um **segundo terminal** e navegue até a pasta `Front-end`.
 2. Execute o servidor com o seguinte comando:
+
     ```bash
     python app.py
     ```
+
 3. Você verá uma mensagem no terminal indicando que o servidor está rodando. Por padrão, ele será executado na porta **5000**.
-    ```
+
+    ```terminal
     * Running on [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
     ```
+
 4. Abra seu navegador e acesse o endereço `http://localhost:5000` para ver a interface do mapa.
 
 ### 4. Simulação de Dados com Postman
